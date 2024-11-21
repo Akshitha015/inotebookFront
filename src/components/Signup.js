@@ -1,34 +1,30 @@
-import React from 'react'
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 const Signup = (props) => {
-    const [credentials,setCredentials]=useState({name:"",email:"",password:"",cpassword:""});
-    const navigate=useNavigate();
+    const [credentials, setCredentials] = useState({ name: "", email: "", password: "", cpassword: "" });
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const {name,email,password}=credentials;
-        console.log("hiii")
+        const { name, email, password } = credentials;
+
         const response = await fetch("https://mernback-github.onrender.com/api/auth/createuser", {
-            
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({name,email,password})
+            body: JSON.stringify({ name, email, password })
         });
-        console.log("function call")
+
         const json = await response.json();
-        console.log(json);
-            // Save the auth-token and redirect
-            if(json.success){
-                localStorage.setItem('auth-token', json['authtoken']);
-                navigate('/');
-                props.showAlert("Account Created Successfully","success");
-            }else{
-                props.showAlert("Invalid Details","danger");
-            }
+        if (json.success) {
+            localStorage.setItem('auth-token', json['authtoken']);
+            navigate('/');
+            props.showAlert("Account Created Successfully", "success");
+        } else {
+            props.showAlert("Invalid Details", "danger");
+        }
     };
 
     const onChange = (e) => {
@@ -43,14 +39,17 @@ const Signup = (props) => {
                     <input type="text" className="form-control" id="name" name="name" onChange={onChange} aria-describedby="emailHelp" />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="email" className="form-label">email</label>
-                    <input type="email" className="form-control" id="email"  onChange={onChange} name="email"/>
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input type="email" className="form-control" id="email" onChange={onChange} name="email" />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
                     <input type="password" className="form-control" id="password" onChange={onChange} name="password" />
                 </div>
-                
+                <div className="mb-3">
+                    <label htmlFor="cpassword" className="form-label">Confirm Password</label>
+                    <input type="password" className="form-control" id="cpassword" onChange={onChange} name="cpassword" />
+                </div>
 
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
@@ -58,4 +57,4 @@ const Signup = (props) => {
     )
 }
 
-export default Signup
+export default Signup;
