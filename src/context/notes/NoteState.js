@@ -37,52 +37,61 @@ const NoteState = (props)=>{
 };
 
     //DELETE NOTE
-    const deleteNote = async(id)=>{
-        //API CALL
-        const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
-            method: 'DELETE',
-            headers: {"Content-Type": "application/json" , "auth-token": localStorage.getItem('auth-token')},
-        });
-        if (!response.ok) {
-            const errorMessage = await response.text(); // Get error message
-            throw new Error(errorMessage);
-        }
-        const json = await response.json(); 
-        console.log(json);
-
-        console.log("Deleting a note with id: " + id);
-        const newNotes = notes.filter((note) => note._id !== id);
-        setNotes(newNotes); // Update the state immediately
+    // Frontend call
+const response = await fetch(`https://mernback-github.onrender.com/api/notes/delete/${note._id}`, {
+    method: 'DELETE',
+    headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('auth-token') // If authentication is required
     }
+});
+const json = await response.json();
+if (json.success) {
+    // Handle successful deletion
+} else {
+    // Handle failure
+}
+
     //EDIT NOTE
-    const editNote = async(id, title, description, tag)=>{
-        //API CALL
-        const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
-            method: 'PUT',
-            headers: {"Content-Type": "application/json" , "auth-token": localStorage.getItem('auth-token')},
-            body: JSON.stringify({title, description, tag}) 
-        });
-        const json = await response.json();
-        console.log(json);
-        //Change in frontend 
-        let newNotes = JSON.parse(JSON.stringify(notes));
+    const editNote = async(id, title, description, tag) => {
+    // API CALL to update the note
+    const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
+        method: 'PUT',
+        headers: {
+            "Content-Type": "application/json",
+            "auth-token": localStorage.getItem('auth-token') // Authentication token
+        },
+        body: JSON.stringify({ title, description, tag }) // Sending the updated data
+    });
+    
+    const json = await response.json();
+    console.log(json);  // Log the response for debugging
+    
+    if (json.success) {
+        // If the update is successful, update the frontend state
+
+        // Creating a copy of the notes array
+        let newNotes = JSON.parse(JSON.stringify(notes)); 
+        
+        // Loop through the notes and find the one to update
         for (let index = 0; index < newNotes.length; index++) {
             const element = newNotes[index];
-            if(element._id === id){
+            if (element._id === id) {
+                // Update the note in the copied array
                 newNotes[index].title = title;
-                newNotes[index].description = description
+                newNotes[index].description = description;
                 newNotes[index].tag = tag;
                 break;
             }
         }
+        
+        // Set the updated notes array into the state
         setNotes(newNotes);
+    } else {
+        // Handle the failure case if the note wasn't updated
+        console.log('Failed to update note');
+        props.showAlert("Failed to update note", "danger");
     }
-    return (
-        // <NoteContext.Provider value={{state : state, update: update}}> 
-        <NoteContext.Provider value ={{notes, getNotes, addNote, deleteNote, editNote }}>
-            {props.children}
-        </NoteContext.Provider>
-    )
 }
 
 export default NoteState;
