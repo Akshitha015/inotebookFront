@@ -18,20 +18,24 @@ const NoteState = (props)=>{
         setNotes(json); 
     }
     //ADD NOTE
-    const addNote = async(title,description,tag)=>{
-        //API CALL
-        const response = await fetch(`${host}/api/notes/addnote`, {
-            method: 'POST',
-            headers: {"Content-Type": "application/json" , "auth-token": localStorage.getItem('auth-token')},
-            body: JSON.stringify({title, description, tag})
-        });
-        // const json = await response.json(); 
-        // console.log(json);
-        console.log("Adding a New note.")
-        const note = await response.json();
-        setNotes(notes.concat(note)); //.concat returns the array , .push just updates an array
-        //setNotes([...notes, note]); // Update the state immediately
+    const addNote = async (title, description, tag) => {
+    const response = await fetch("https://mernback-github.onrender.com/api/notes/addnote", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "auth-token": localStorage.getItem("auth-token"),
+        },
+        body: JSON.stringify({ title, description, tag }),
+    });
+
+    const json = await response.json();
+    if (!response.ok) {
+        throw new Error(json.error || "Failed to add note");
     }
+
+    setNotes(notes.concat(json));
+};
+
     //DELETE NOTE
     const deleteNote = async(id)=>{
         //API CALL
